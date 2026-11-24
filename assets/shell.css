@@ -1,0 +1,310 @@
+/* The terminal page layout. The page is a stack of panels in the order the
+   design fixes: target type, target selection and confirmation, session state,
+   then one terminal area per session (CONSOLE-C-8). On a narrow screen the
+   same order holds, the selection stays operable and each terminal area
+   scrolls on its own without covering the disconnect entry (CONSOLE-C-17). */
+
+:root {
+  color-scheme: light dark;
+  --panel-border: #c9ccd4;
+  --panel-padding: 12px 16px;
+  --text: #1f2328;
+  --muted: #5c6570;
+  --accent: #1f6feb;
+  --danger: #b3261e;
+  --output-bg: #f6f8fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.terminal {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.brand {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.stale {
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.panel {
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: var(--panel-padding);
+  margin-bottom: 12px;
+}
+
+.panel h2 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+
+.panel h3 {
+  font-size: 13px;
+  margin: 8px 0 6px;
+  color: var(--muted);
+}
+
+.target-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.target-type {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+}
+
+.target-type-name {
+  font-weight: 600;
+}
+
+.target-type-identity,
+.target-fields,
+.confirm-line,
+.state-rule,
+.audit-rule {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.target-group + .target-group {
+  margin-top: 12px;
+}
+
+.target-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.target-name {
+  font-weight: 500;
+}
+
+.confirm-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+button {
+  font: inherit;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.session-state-line,
+.state-count {
+  margin: 4px 0;
+}
+
+.session-areas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-area {
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.session-area[data-state="failed"] {
+  border-color: var(--danger);
+}
+
+.session-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.session-target {
+  font-weight: 600;
+}
+
+.session-state {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border);
+}
+
+.session-state[data-state="connected"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.session-state[data-state="failed"] {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.session-expires {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.session-failure {
+  color: var(--danger);
+  margin: 8px 0 0;
+}
+
+.session-settlement {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.session-settlement[data-settlement="unknown"] {
+  color: var(--danger);
+}
+
+.session-receipt {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+/* The terminal area scrolls on its own and never covers the disconnect entry
+   above it, so a narrow window keeps both reachable (CONSOLE-C-17). */
+.session-output {
+  margin: 8px 0;
+  max-height: 220px;
+  overflow: auto;
+  background: var(--output-bg);
+  border-radius: 6px;
+  padding: 8px;
+  white-space: pre-wrap;
+}
+
+.session-input {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.session-input input,
+.session-input textarea {
+  font: inherit;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.session-input textarea {
+  resize: vertical;
+}
+
+.empty-state,
+.empty-output,
+.loading {
+  color: var(--muted);
+  margin: 4px 0;
+}
+
+.failure {
+  color: var(--danger);
+}
+
+.notice {
+  color: var(--muted);
+}
+
+.audit-session + .audit-session {
+  margin-top: 8px;
+}
+
+.audit-events {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+/* Narrow screen: the target and connection state stay first and operable, and
+   each terminal area keeps its own scroll region (CONSOLE-C-17). */
+@media (max-width: 640px) {
+  .terminal {
+    padding: 8px;
+  }
+
+  .panel {
+    padding: 10px;
+  }
+
+  .session-header {
+    flex-wrap: wrap;
+  }
+
+  .session-expires {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .session-input {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .session-input button {
+    width: 100%;
+  }
+}
